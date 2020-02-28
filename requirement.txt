@@ -1,0 +1,3 @@
+SalesforcexytoolsCore
+requests[security]
+XlsxWriter
