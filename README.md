@@ -1,15 +1,3 @@
----
-categories: sfdc-cli
-data: 2020/02/28 20:08:26
-tags:
-- sfdc
-- salesforce
-- sfdc-cli
-title: Readme
-update_date: 2020/02/28 20:16:01
-
----
-
 # sfdc-cli
 
 [exiahuang/sfdc-cli](https://github.com/exiahuang/sfdc-cli) is a sfdc development kit.
