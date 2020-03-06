@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-from sfdc_cli.testclass import Testclass
+from sfdc_cli.data import DataApi
 
 command_name = os.path.basename(__file__).split('.', 1)[0].replace("_", ":")
 
@@ -9,8 +9,8 @@ command_name = os.path.basename(__file__).split('.', 1)[0].replace("_", ":")
 def register(parser, subparsers, **kwargs):
 
     def handler(args):
-        if args.project and args.sourcepath:
-            Testclass(project_dir=args.project).run(args.sourcepath)
+        if args.project:
+            DataApi(project_dir=args.project).query_tooling(args.soql)
         else:
             print(parser.parse_args([command_name, '--help']))
 
@@ -20,12 +20,12 @@ def register(parser, subparsers, **kwargs):
     subcommand.add_argument('-p',
                             '--project',
                             type=str,
-                            help='project dir',
+                            help='project dir, default is current working directory',
                             required=False,
                             default=".")
     subcommand.add_argument('-s',
-                            '--sourcepath',
+                            '--soql',
                             type=str,
-                            help='source path',
+                            help='soql',
                             required=True)
     subcommand.set_defaults(handler=handler)

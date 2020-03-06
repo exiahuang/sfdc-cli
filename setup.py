@@ -8,8 +8,49 @@
 # http://www.opensource.org/licenses/Apache-2.0
 # Copyright (c) 2020, exiahuang <exia.huang@outlook.com>
 
+import sys
 from setuptools import setup, find_packages
 from sfdc_cli import __version__
+
+try:
+    # This will create an exe that needs Microsoft Visual C++ 2008
+    # Redistributable Package
+    import py2exe
+except ImportError:
+    if len(sys.argv) >= 2 and sys.argv[1] == 'py2exe':
+        print('Cannot import py2exe', file=sys.stderr)
+        exit(1)
+
+py2exe_options = {
+    'bundle_files': 1,
+    'compressed': 1,
+    'optimize': 2,
+    'dist_dir': '.',
+    # 'dll_excludes': [],
+}
+
+DESCRIPTION = 'sfdc development kit'
+LONG_DESCRIPTION = '''
+sfdc development kit
+'''
+
+py2exe_console = [{
+    'script': './sfdc_cli/cli.py',
+    'dest_base': 'sfdc-cli',
+    'version': __version__,
+    'description': DESCRIPTION,
+    'comments': LONG_DESCRIPTION,
+    'product_name': 'sfdc-cli',
+    'product_version': __version__,
+}]
+
+py2exe_params = {
+    'console': py2exe_console,
+    'options': {
+        'py2exe': py2exe_options
+    },
+    'zipfile': None
+}
 
 tests_require = [
     'mock',
@@ -23,25 +64,36 @@ tests_require = [
     'sphinx',
 ]
 
+if len(sys.argv) >= 2 and sys.argv[1] == 'py2exe':
+    params = py2exe_params
+else:
+    params = {
+        'packages': find_packages(),
+        'include_package_data': True,
+        'entry_points': {
+            'console_scripts': [
+                # add cli scripts here in this form:
+                'sfdc=sfdc_cli.cli:main',
+            ],
+        }
+    }
+
 setup(
     name='sfdc-cli',
     version=__version__,
-    description='sfdc development kit',
-    long_description='''
-sfdc development kit
-''',
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
     keywords='sfdc-cli sdk tools xytools-cli salesforce',
     author='exiahuang',
     author_email='exia.huang@outlook.com',
     url='https://github.com/exiahuang/sfdc-cli',
-    license='MIT',
+    license='Apache License 2.0',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache License 2.0',
         'Natural Language :: English',
         'Operating System :: Unix',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
@@ -52,8 +104,6 @@ sfdc development kit
         'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
     ],
-    packages=find_packages(),
-    include_package_data=True,
     install_requires=[
         # add your dependencies here
         # remember to use 'package-name>=x.y.z,<x.y+1.0' notation (this way you get bugfixes)
@@ -64,10 +114,4 @@ sfdc development kit
     extras_require={
         'tests': tests_require,
     },
-    entry_points={
-        'console_scripts': [
-            # add cli scripts here in this form:
-            'sfdc=sfdc_cli.cli:main',
-        ],
-    },
-)
+    **params)

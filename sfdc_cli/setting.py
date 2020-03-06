@@ -9,9 +9,9 @@ sys_https_proxy = os.getenv('https_proxy', '')
 
 OAUTH2_SETTING = {
     "client_id":
-        "3MVG9YDQS5WtC11pNZnExZq_P89KLWoOrt0wMuf.P_qmK_R94WM3NYjO_ZddqZQ4GGQAJ6D1vPstnF_oEH6kF",
+        "3MVG9YDQS5WtC11pNZnExZq_P8zQFHcFI0XKGSpyyMxC.GIuqp.5sOr37Hd0ZqCTGRNAImvRO16.P0Kxc2ZnK",
     "client_secret":
-        "6963483453258622887",
+        "7230DB2DA454C7E4B04B7C3E3303B288CCB8336E46A8D627190D61FDB6D10331",
     "redirect_uri":
         "http://localhost:56888/auth/callback"
 }
@@ -37,10 +37,8 @@ class SfBasicConfig():
                 os.path.basename(self._project_dir),
             "project_config_path":
                 os.path.join(self._project_dir, config_dir, "xyconfig.json"),
-            "xyfolder":
-                os.path.join(self._project_dir, "log"),
             "work_dir":
-                os.path.join(self._project_dir, "log")
+                os.path.join(self._project_dir, config_dir, "work")
         }
 
         settings["default_project"] = self.get_project_name()
@@ -209,9 +207,6 @@ class SfBasicConfig():
     def get_setting(self):
         return self.setting
 
-    def get_xyfolder(self):
-        return self.setting["xyfolder"]
-
     def get_project_dir(self):
         return self.setting["project_dir"]
 
@@ -219,13 +214,13 @@ class SfBasicConfig():
         return self.setting["work_dir"]
 
     def get_tmp_dir(self):
-        tmp_dir = os.path.join(self.setting["work_dir"], ".tmp")
+        tmp_dir = os.path.join(self.get_config_dir(), ".tmp")
         if not os.path.exists(tmp_dir):
             os.makedirs(tmp_dir)
         return tmp_dir
 
     def get_ant_migration_tool_dir(self):
-        return os.path.join(self.setting["work_dir"], "MetadataBackupTools")
+        return os.path.join(self.get_work_dir(), "MetadataBackupTools")
 
     def get_deploy_tmp_dir(self):
         return os.path.join(self.get_ant_migration_tool_dir(), "codepkg")
@@ -249,10 +244,7 @@ class SfBasicConfig():
         return self.setting["project_config_path"]
 
     def is_use_os_terminal(self):
-        if "use_os_terminal" in self.setting:
-            return self.setting["use_os_terminal"]
-        self.setting["use_os_terminal"] = False
-        return self.setting["use_os_terminal"]
+        return
 
     def get_proxy(self):
         if "proxy" in self.setting:
@@ -366,18 +358,6 @@ def get_default_project_config(config_file_full_path, jar_home):
     "src_dir": "src",
     "authentication": "password", 
     "jar_home": "{jar_home}", 
-    "use_os_terminal": false, 
-    "auto_save_to_server": false,
-    "app" : {
-        "winmerge": "{winmerge}", 
-        "notepad": "{notepad}",
-        "Bash" : "cmd /k cd /d {file_dir}"
-    },
-    "default_browser": "chrome", 
-    "browsers": {
-        "chrome": "C:\\\\Program Files (x86)\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe", 
-        "IE": "C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe"
-    }, 
     "debug_levels": {
         "Apex_Code": "DEBUG", 
         "Callout": "INFO", 

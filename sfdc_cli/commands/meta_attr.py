@@ -24,7 +24,7 @@ def register(parser, subparsers, **kwargs):
     subcommand.add_argument('-p',
                             '--project',
                             type=str,
-                            help='project dir',
+                            help='project dir, default is current working directory',
                             required=False,
                             default=".")
     subcommand.add_argument('-s',

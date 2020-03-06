@@ -64,6 +64,9 @@ class Soap(Salesforce):
             "SOAPAction": '""'
         }
 
+        self.instance_url = 'https://{instance}'.format(
+            instance=self.sf_instance)
+
         self.base_url = ('https://{instance}/services/data/v{version}/'.format(
             instance=self.sf_instance, version=self.sf_version))
         self.apex_url = ('https://{instance}/services/apexrest/'.format(
@@ -199,6 +202,23 @@ class Soap(Salesforce):
                               verify=False)
         # if result.status_code >= 300:
         #     raise SoapException(result, result.status_code)
+        return result
+
+
+class RestApi(Soap):
+
+    def get(self, path, params={}):
+        return self.call_rest("GET", path, params=params)
+
+    def post(self, path, params):
+        return self.call_rest("POST", path, params=params)
+
+    def call_rest(self, method, path, **kwargs):
+        # print(self.instance_url + path)
+        result = self._call_salesforce(method, self.instance_url + path,
+                                       **kwargs)
+        if result.status_code != 200:
+            raise SoapException(result, result.status_code)
         return result
 
 

@@ -1,5 +1,7 @@
 """Simple-Salesforce Package"""
-# flake8: noqa
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 from .myconsole import MyConsole
 
@@ -24,6 +26,7 @@ from .login import (
 from .core import (
     Soap,
     MetadataApi,
+    RestApi,
     ToolingApi,
     SoapException
 )

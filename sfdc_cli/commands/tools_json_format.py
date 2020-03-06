@@ -15,8 +15,11 @@ def register(parser, subparsers, **kwargs):
         else:
             print(parser.parse_args([command_name, '--help']))
 
-    subcommand = subparsers.add_parser(command_name,
-                                       help='json format')
+    subcommand = subparsers.add_parser(command_name, help='json format')
 
-    subcommand.add_argument('-i', '--inline', type=argparse.FileType('r'), default=sys.stdin, help='input json data')
+    subcommand.add_argument('-i',
+                            '--inline',
+                            type=argparse.FileType('r', encoding='UTF-8'),
+                            default=sys.stdin,
+                            help='input json data')
     subcommand.set_defaults(handler=handler)

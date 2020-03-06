@@ -82,11 +82,11 @@ class RetrieveApi():
         else:
             logging.error("refresh failed. ")
 
-    def unzip(self, filepath, savedir, srcpath, is_remove_zip):
+    def unzip(self, filepath, savedir, is_remove_zip):
         if os.path.exists(filepath):
             import zipfile
             from distutils import dir_util
-            src_path = os.path.join(savedir, srcpath)
+            src_path = os.path.join(savedir, self.settings["src_dir"])
             base_src_dir = os.path.dirname(src_path)
             base_src_name = os.path.basename(src_path)
             unpackaged_path = os.path.join(base_src_dir, "unpackaged")

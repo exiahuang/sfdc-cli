@@ -3,14 +3,21 @@
 
 import os
 from sfdc_cli.version import __version__
+from .setting import SfBasicConfig
 from .templates.template import Template
 from . import baseutil, logging
 
 
 class Metadata():
 
+    def __init__(self, project_dir=None):
+        self.sf_basic_config = SfBasicConfig(project_dir)
+        self.settings = self.sf_basic_config.get_setting()
+
     def _new_metadata(self, metadata_type, template_name, api_name, object_name,
-                      api_version, src_dir, is_overwrite):
+                      is_overwrite):
+        api_version = self.settings["api_version"]
+        src_dir = self.settings["src_dir"]
         data = {"api_name": api_name, "object_name": object_name}
         src = Template().get_src(metadata_type, template_name, data)
         attr = self.get_attr(metadata_type)
@@ -59,41 +66,30 @@ class Metadata():
         baseutil.SysIo().save_file(full_path=full_path + "-meta.xml",
                                    content=meta_xml)
 
-    def new_apex(self, api_name, template_name, src_dir, api_version,
-                 is_overwrite):
+    def new_apex(self, api_name, template_name, is_overwrite):
         self._new_metadata("ApexClass",
                            template_name,
                            api_name,
                            object_name="",
-                           api_version=api_version,
-                           src_dir=src_dir,
                            is_overwrite=is_overwrite)
 
-    def new_page(self, api_name, template_name, src_dir, api_version,
-                 is_overwrite):
+    def new_page(self, api_name, template_name, is_overwrite):
         self._new_metadata("ApexPage",
                            template_name,
                            api_name,
                            object_name="",
-                           api_version=api_version,
-                           src_dir=src_dir,
                            is_overwrite=is_overwrite)
 
-    def new_component(self, api_name, src_dir, api_version, is_overwrite):
+    def new_component(self, api_name, is_overwrite):
         self._new_metadata("ApexComponent",
                            template_name="ApexComponent.component",
                            api_name=api_name,
                            object_name="",
-                           api_version=api_version,
-                           src_dir=src_dir,
                            is_overwrite=is_overwrite)
 
-    def new_trigger(self, api_name, object_name, template_name, src_dir,
-                    api_version, is_overwrite):
+    def new_trigger(self, api_name, object_name, template_name, is_overwrite):
         self._new_metadata("ApexTrigger",
                            template_name,
                            api_name,
                            object_name=object_name,
-                           api_version=api_version,
-                           src_dir=src_dir,
                            is_overwrite=is_overwrite)

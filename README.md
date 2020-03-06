@@ -11,13 +11,13 @@ I use this code, and turn it to command line.
 ## feature
 
 -   TODO: integrate with [exiahuang/xysfdx](https://github.com/exiahuang/xysfdx), and run in vscode.
--   use python
+-   use python3
 
 # install
 
 ## install from pip
 
-TODO: not work now
+TODO: not work now.
 
 ```sh
 pip3 install sfdc-cli
@@ -45,30 +45,61 @@ sfdc development kit v0.1.0
 
 positional arguments:
 
-    meta:attr           see `meta:attr -h`
-    meta:cache          see `meta:cache -h`
-    meta:delete         see `meta:delete -h`
+    apex:test:coverage  see `apex:test:coverage -h`
+    data:soql:query     see `data:soql:query -h`
     meta:new            see `meta:new -h`
-    meta:refresh        see `meta:refresh -h`
-    meta:refresh:aura   see `meta:refresh:aura -h`
-    meta:refresh:dir    see `meta:refresh:dir -h`
-    meta:retrieve       see `meta:retrieve -h`
-    meta:template:apex  see `meta:template:apex -h`
+    folder:list         see `folder:list -h`
+    ant:migration:tool  see `ant:migration:tool -h`
+    meta:update         see `meta:update -h`
     meta:template:component
                         see `meta:template:component -h`
+    sobject:data:delete
+                        see `sobject:data:delete -h`
+    meta:template:apex  see `meta:template:apex -h`
+    coder:apex:testclass:generator
+                        see `coder:apex:testclass:generator -h`
+    packagexml:local    see `packagexml:local -h`
+    apex:execute        see `apex:execute -h`
+    coder:apex:snippet:insert:ramdam:data
+                        see `coder:apex:snippet:insert:ramdam:data -h`
+    sobject:export:xlsx
+                        see `sobject:export:xlsx -h`
+    meta:attr           see `meta:attr -h`
+    sobject:data:create
+                        see `sobject:data:create -h`
+    download:attachment
+                        see `download:attachment -h`
+    coder:apex:page:generator
+                        see `coder:apex:page:generator -h`
+    meta:refresh:dir    see `meta:refresh:dir -h`
+    sobject:fields:desc
+                        see `sobject:fields:desc -h`
+    tools:json:format   json format
+    meta:retrieve       see `meta:retrieve -h`
+    coder:permission:build
+                        see `coder:permission:build -h`
+    sobject:data:get    see `sobject:data:get -h`
+    data:tooling:query  see `data:tooling:query -h`
+    meta:cache          see `meta:cache -h`
+    coder:apex:snippet:insert:data:from:soql
+                        see `coder:apex:snippet:insert:data:from:soql -h`
+    coder:copy:aura     see `coder:copy:aura -h`
+    apex:test:run       see `apex:test:run -h`
+    coder:permission:list
+                        see `coder:permission:list -h`
+    meta:refresh        see `meta:refresh -h`
+    project:init        see `project:init -h`
+    meta:refresh:aura   see `meta:refresh:aura -h`
+    call:rest:api       see `call:rest:api -h`
     meta:template:page  see `meta:template:page -h`
+    meta:delete         see `meta:delete -h`
+    sobject:data:update
+                        see `sobject:data:update -h`
+    packagexml:server   see `packagexml:server -h`
+    sobject:list        see `sobject:list -h`
     meta:template:trigger
                         see `meta:template:trigger -h`
-    meta:update         see `meta:update -h`
-    packagexml:local    see `packagexml:local -h`
-    packagexml:server   see `packagexml:server -h`
-    project:init        see `project:init -h`
-    sobject:list        see `sobject:list -h`
-    sobject:xlsx        see `sobject:xlsx -h`
-    test:coverage       see `test:coverage -h`
-    test:run            see `test:run -h`
-    tools:copy:aura     see `tools:copy:aura -h`
-    tools:json:format   json format
+    coder:snippet:soql  see `coder:snippet:soql -h`
     help                see `help -h`
 
 optional arguments:
@@ -78,7 +109,11 @@ optional arguments:
 ## new project
 
 ```sh
-sfdc project:init -d project/sfdc-project1
+# for product
+sfdc project:init -d project/sfdc-project1 -u username -p password -t security_token -s src -v api_version
+# for sandbox/stgfull
+sfdc project:init -d project/sfdc-project1 -u username -p password -t security_token -s src -v api_version --sandbox
+
 cd project/sfdc-project1
 ```
 
@@ -92,8 +127,12 @@ sfdc meta:retrieve -p . -d package_dir -n package.zip
 sfdc meta:retrieve -p . -d package_dir -n package1.zip -m ApexClass ApexTrigger ApexPage ApexComponent CustomObject
 
 # retrieve metadata and unzip, source path: src
-sfdc meta:retrieve -p . -d package_dir -n package2.zip -m ApexClass ApexTrigger ApexPage AuraDefinitionBundle LightningComponentBundle --unzip --delete_after_unzip --sourcepath src
+sfdc meta:retrieve -p . -d package_dir -n package2.zip -m ApexClass ApexTrigger ApexPage AuraDefinitionBundle LightningComponentBundle --unzip --delete_after_unzip
 
+
+sfdc meta:retrieve -p . -d package_dir -n package2.zip -m CustomObject --unzip --delete_after_unzip
+
+sfdc meta:retrieve -p . -d package_dir -n package2.zip -m PermissionSet --unzip --delete_after_unzip
 ```
 
 ## metadata template
@@ -101,31 +140,31 @@ sfdc meta:retrieve -p . -d package_dir -n package2.zip -m ApexClass ApexTrigger 
 ### init apex class from template
 
 ```sh
-sfdc meta:template:apex -d ./src -n HelloApex --template ApexClass.cls -v 47.0
-sfdc meta:template:apex -d ./src -n HelloApexBatch --template BatchApexClass.cls -v 47.0
-sfdc meta:template:apex -d ./src -n HelloApexTest --template UnitTestApexClass.cls -v 47.0
-sfdc meta:template:apex -d ./src -n HelloApexBatchTest --template BDDUnitTestApexClass.cls -v 47.0
+sfdc meta:template:apex -n HelloApex --template ApexClass.cls
+sfdc meta:template:apex -n HelloApexBatch --template BatchApexClass.cls
+sfdc meta:template:apex -n HelloApexTest --template UnitTestApexClass.cls
+sfdc meta:template:apex -n HelloApexBatchTest --template BDDUnitTestApexClass.cls
 ```
 
 ### init trigger from template
 
 ```sh
-sfdc meta:template:trigger -d ./src -n HelloApexTrigger --sobject Opportunity --template ApexTrigger.trigger -v 47.0
-sfdc meta:template:trigger -d ./src -n HelloApexTriggerAllEvents --sobject Opportunity --template ApexTriggerAllEvents.trigger -v 47.0
-sfdc meta:template:trigger -d ./src -n HelloApexTriggerBulk --sobject Opportunity --template ApexTriggerBulk.trigger -v 47.0
+sfdc meta:template:trigger -n HelloApexTrigger --sobject Opportunity --template ApexTrigger.trigger
+sfdc meta:template:trigger -n HelloApexTriggerAllEvents --sobject Opportunity --template ApexTriggerAllEvents.trigger
+sfdc meta:template:trigger -n HelloApexTriggerBulk --sobject Opportunity --template ApexTriggerBulk.trigger
 ```
 
 ### init visualforce from template
 
 ```sh
-sfdc meta:template:page -d ./src -n HelloApexPage --template ApexPage.page -v 47.0
-sfdc meta:template:page -d ./src -n HelloHeaderPageBlock --template HeaderPageBlock.page -v 47.0
+sfdc meta:template:page -n HelloApexPage --template ApexPage.page
+sfdc meta:template:page -n HelloHeaderPageBlock --template HeaderPageBlock.page
 ```
 
 ### init visualforce component
 
 ```sh
-sfdc meta:template:component -d ./src -n HelloCmp -v 47.0
+sfdc meta:template:component -n HelloCmp
 ```
 
 ## metadata new/update/refresh/delete
@@ -229,41 +268,259 @@ scan directory and build package.xml
 sfdc packagexml:local --scandir ./src --savedir . -n package.xml
 ```
 
-## run apex testclass
+## sfdc apex
+
+### Executes anonymous Apex code
 
 ```sh
-sfdc test:run -p . -s ./src/classes/HelloApexTest.cls
-sfdc test:run -p . -s ./src/classes/HelloApexBatchTest.cls
+# create a apex code
+mkdir ./tmp/
+echo "System.debug('hello world');" > ./tmp/HelloApex.apex
+
+# run the apex code
+sfdc apex:execute -p . -s ./tmp/HelloApex.apex
+
+# use pipe
+cat ./tmp/HelloApex.apex | sfdc apex:execute -p .
 ```
 
-## get coverage
+### run apex testclass
 
 ```sh
-sfdc test:coverage -p . -f ./log/apex_coverage.log
+sfdc apex:test:run -p . -s ./src/classes/HelloApexTest.cls
+sfdc apex:test:run -p . -s ./src/classes/HelloApexBatchTest.cls
+```
+
+### get coverage
+
+```sh
+sfdc apex:test:coverage -p . -f ./log/apex_coverage.log
 ```
 
 ## sobject
 
+### create sobject data
+
+```sh
+# insert a account
+echo "{\"Name\":\"exiahuang\"}" | sfdc sobject:data:create -s Account
+
+# use json_data_file to create sobject data
+sfdc sobject:data:create -s Account --data $json_data_file_path
+
+```
+
+### get sobject data
+
+```sh
+sfdc sobject:data:get -s Account --id $account_id
+```
+
+### delete sobject data
+
+```sh
+sfdc sobject:data:delete -s Account --id $account_id
+```
+
+### update sobject data
+
+```sh
+# update sobject data from pipe
+echo "{\"Phone\":\"080-0000-0000\"}" | sfdc sobject:data:update -s Account --id $account_id
+
+# update sobject data from json file
+sfdc sobject:data:update -s Account --id $account_id --data $json_data_file_path
+```
+
 ### list sobject
 
 ```sh
-python3 -m sfdc_cli.cli sobject:list -p $project_dir
+cd $project_dir
+# print in console
+sfdc sobject:list
+
+# save as markdown file
+sfdc sobject:list > log/sobject.md
 ```
 
 ### export sobject as xlsx file
 
 ```sh
-python3 -m sfdc_cli.cli sobject:xlsx -p $project_dir -s
+cd $project_dir
+sfdc sobject:export:xlsx -s log/sobject.xlsx
 ```
 
-## tools
+### describe fields
+
+```sh
+sfdc sobject:fields:desc -s $sobject_name
+```
+
+## data query
+
+### soql query
+
+```sh
+sfdc data:soql:query -s "SELECT id,name from USER limit 10"
+```
+
+### tooling query
+
+```sh
+sfdc data:tooling:query -s "SELECT Id,Name FROM ApexClass limit 100"
+```
+
+## call salesforce rest api
+
+### Get method
+
+```sh
+# call /services/data/v45.0/sobjects
+sfdc call:rest:api -e /services/data/v45.0/sobjects
+
+# call /services/data/v45.0/sobjects/Account
+sfdc call:rest:api -e /services/data/v45.0/sobjects/Account
+sfdc call:rest:api -e /services/data/v45.0/sobjects/Opportunity
+
+```
+
+### use file as params
+
+```sh
+echo '{"q": "Select Id, Name From ApexClass Limit 3"}' > tmp/sf_rest_test.json
+sfdc call:rest:api -m GET -e /services/data/v45.0/tooling/query --use_params --params tmp/sf_rest_test.json
+```
+
+### use pipe to call rest api
+
+example : query ApexCodeCoverage
+
+```sh
+# example1 : query ApexCodeCoverage
+echo '{"q": "SELECT Id, ApexTestClassId, TestMethodName, ApexClassorTriggerId, NumLinesCovered, NumLinesUncovered, Coverage FROM ApexCodeCoverage"}' | sfdc call:rest:api -m GET -e /services/data/v45.0/tooling/query --use_params
+
+
+# example1 : query ApexClass
+echo '{"q": "Select Id, Name From ApexClass Limit 3"}' | sfdc call:rest:api -m GET -e /services/data/v45.0/tooling/query --use_params
+```
+
+## code creator
+
+### create soql
+
+```sh
+#
+sfdc coder:snippet:soql -s $sobject_name --custom_field_only --updateable_field_only --include_comment --include_relationship
+
+#
+sfdc coder:snippet:soql -s Account  --custom_field_only --updateable_field_only --include_comment --include_relationship
+```
+
+### insert sobject data code snippet from soql
+
+```sh
+sfdc coder:apex:snippet:insert:data:from:soql -s $soql
+sfdc coder:apex:snippet:insert:data:from:soql -s "SELECT name, firstname, lastname FROM Account LIMIT 2"
+```
+
+### insert sobject data code snippet
+
+```sh
+sfdc coder:apex:snippet:insert:ramdam:data -s $sobject_name --all_fields
+sfdc coder:apex:snippet:insert:ramdam:data -s Account --all_fields
+
+```
+
+### generator testclass from apex
+
+```sh
+sfdc coder:apex:testclass:generator -f $apex_code_file_path
+```
+
+### generator VisualForce/Controller/DTO/DAO Code from sobject
+
+```sh
+sfdc coder:apex:page:generator --sobject $sobject_name --savedir tmp/mycode/src --custom_field_only --include_validate
+```
 
 ### copy lightning
 
 ```sh
-sfdc tools:copy:aura -f $from_lightning_path -t $to_lightning_path
-sfdc tools:copy:aura -f /app/project/sfdc-project1/src/aura/HelloWorld -t /app/project/sfdc-project1/src/aura/HelloWorld1
+sfdc coder:copy:aura -f $from_lightning_path -t $to_lightning_path
+sfdc coder:copy:aura -f /app/project/sfdc-project1/src/aura/HelloWorld -t /app/project/sfdc-project1/src/aura/HelloWorld1
 ```
+
+### create permission metadata
+
+retrieve sobject metadata first
+
+```sh
+# retrieve sobject metadata
+sfdc meta:retrieve -p . -d package_dir -n package2.zip -m CustomObject --unzip --delete_after_unzip
+# or use meta:refresh:dir
+sfdc meta:refresh:dir -p . -d ./src/objects
+```
+
+create permission from sobject metadata
+
+```sh
+# include sobject permission and all fields permission
+sfdc coder:permission:build --sobject_dir ./src/objects --savefile ./src/permissionsets/dev_permission.permissionset --include_all_sobject_permission
+
+# fieldPermissions
+sfdc coder:permission:build --sobject_dir ./src/objects --savefile ./src/permissionsets/dev_permission.permissionset --fields Account.custom_field1 Account.custom_field2 Opportunity.custom_field1
+```
+
+list fields from sobject metadata directory
+
+```sh
+# list fields
+sfdc coder:permission:list -t fields --sobject_dir ./src/objects
+
+sfdc coder:permission:list -t fields --sobject_dir ./src/objects | grep Account
+
+```
+
+list sobject from sobject metadata directory
+
+```
+# list sobject
+sfdc coder:permission:list -t sobject --sobject_dir ./src/objects
+
+```
+
+## salesforce folder
+
+```sh
+# report folder
+sfdc folder:list -n ReportFolder
+
+# email folder
+sfdc folder:list -n EmailTemplate
+```
+
+## download salesforce attachment
+
+download salesforce attachment(ContentVersion):
+
+-   max limit size: 2000
+-   default filename template: `{Id}_{Title}_v{VersionNumber}.{FileExtension}`
+
+```sh
+sfdc download:attachment --savedir tmp/download --filename "{Title}_v{VersionNumber}.{FileExtension}" --limit 2000
+```
+
+## Ant Migration Tool
+
+### init Ant Migration Tool
+
+```sh
+sfdc ant:migration:tool
+# or
+sfdc ant:migration:tool -p .
+```
+
+## tools
 
 ### json format
 
@@ -272,8 +529,6 @@ cat $json_file_path | sfdc tools:json:format
 
 sfdc tools:json:format -i $json_file_path
 ```
-
-
 
 # For developer
 
@@ -438,7 +693,12 @@ result:
 }
 ```
 
+# package
 
+```sh
+python3 setup.py sdist
+python3 setup.py bdist_wininst
+```
 
 # Acknowledgement
 

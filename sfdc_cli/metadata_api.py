@@ -19,11 +19,6 @@ class MetadataApi():
                                       Soap_Type=ToolingApi)
         self.metadata_util = util.MetadataUtil(self.sf_basic_config)
 
-    def load_file(self, file):
-        with open(file) as fp:
-            content = fp.read()
-        return content
-
     def _print_success_message(self, meta_id, filepath):
         logging.info("local path : %s" % filepath)
         logging.info("sfdc url : https://%s/%s" %
@@ -34,7 +29,7 @@ class MetadataApi():
             attr = baseutil.SysIo().get_file_attr(filepath)
             metadata_type = attr['metadata_type']
             api_name = attr["name"]
-            src_content = self.load_file(filepath)
+            src_content = baseutil.read_file(filepath)
             if metadata_type == "ApexClass":
                 status_code, result = self.meta_api.createApexClass(
                     api_name, src_content)
@@ -134,8 +129,9 @@ class MetadataApi():
             logging.error(ex)
 
     # Lightning update
+
     def _update_metadata_lux(self, filepath, meta_attr):
-        body = self.load_file(filepath)
+        body = baseutil.read_file(filepath)
         status_code, result = self.meta_api.updateLux(meta_attr["id"],
                                                       {"Source": body})
         if status_code > 300:
@@ -147,7 +143,7 @@ class MetadataApi():
 
     # apex, visualforce, trigger, component update
     def _update_meta_to_server(self, filepath, meta_attr):
-        body = self.load_file(filepath)
+        body = baseutil.read_file(filepath)
         result = self.meta_api.updateMetadata(meta_attr["type"],
                                               meta_attr["id"], body)
         if not result["is_success"]:
@@ -193,7 +189,7 @@ class MetadataApi():
                 logging.error(result)
         except Exception as ex:
             logging.error(ex)
-    
+
     def _check_is_aura_dir(self, targetdir):
         _targetdir = os.path.abspath(targetdir)
         aura_name = os.path.basename(_targetdir)

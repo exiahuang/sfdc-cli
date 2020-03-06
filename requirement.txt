@@ -1,3 +1,2 @@
-SalesforcexytoolsCore
 requests[security]
 XlsxWriter

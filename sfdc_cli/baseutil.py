@@ -220,6 +220,14 @@ def save_file(full_path, content, newline='\n', encoding='utf-8'):
         fp.close()
 
 
+def read_file(filepath, encoding='utf-8', default=None):
+    if os.path.exists(filepath):
+        with open(filepath, 'r', encoding=encoding) as fp:
+            content = fp.read()
+        return content
+    return default
+
+
 # 次の文字は、ファイル名の一部としては使用できません: 不等号 (< >)、アスタリスク (*)、疑問符 (?)、二重引用符 (")、縦線またはパイプ (|)、コロン (:)、スラッシュ (/)、または角かっこ ([])。
 def get_excel_sheet_name(worksheet_name):
     can_not_use_list = ['<', '>', '*', '?', '"', '|', ':', '/', '[', ']']
@@ -299,7 +307,7 @@ def get_simple_soql_str(sobject, fields, no_address=False, condition=''):
 
 
 def get_soql_result(soql_str, soql_result):
-    message = 'totalSize: ' + xstr(soql_result['totalSize']) + "\n\n"
+    message = ""
     if soql_result['totalSize'] == 0:
         message += 'no record!!'
         return message
@@ -555,7 +563,7 @@ class SysIo():
                 "lux_name":
                     ""
             }
-            
+
             if os.path.isdir(full_file_path) and attr["dir"] == "aura":
                 attr["metadata_sub_folder"] = ""
                 attr["metadata_folder"] = attr["dir"]
@@ -599,7 +607,6 @@ class SysIo():
             else:
                 attr["file_key"] = "%s/%s" % (attr["metadata_folder"],
                                               attr["file_name"])
-
 
             attr["is_lux"] = attr[
                 "metadata_type"] == "AuraDefinitionBundle" and os.path.isfile(
