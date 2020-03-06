@@ -11,6 +11,7 @@
 import sys
 from setuptools import setup, find_packages
 from sfdc_cli import __version__
+from os import path
 
 try:
     # This will create an exe that needs Microsoft Visual C++ 2008
@@ -33,6 +34,10 @@ DESCRIPTION = 'sfdc development kit'
 LONG_DESCRIPTION = '''
 sfdc development kit
 '''
+# read the contents of your README file
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    LONG_DESCRIPTION = f.read()
 
 py2exe_console = [{
     'script': './sfdc_cli/cli.py',
@@ -83,6 +88,7 @@ setup(
     version=__version__,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     keywords='sfdc-cli sdk tools xytools-cli salesforce',
     author='exiahuang',
     author_email='exia.huang@outlook.com',
@@ -91,7 +97,7 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache License 2.0',
+        'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
         'Operating System :: Unix',
         'Programming Language :: Python :: 3.2',
