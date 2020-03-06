@@ -3,14 +3,10 @@
 [exiahuang/sfdc-cli](https://github.com/exiahuang/sfdc-cli) is a sfdc development kit.
 It is licensed under the `Apache License 2.0`
 
-## preface
-
-I build a sublime plugin [exiahuang/SalesforceXyTools](https://github.com/exiahuang/SalesforceXyTools) for sfdc 3 year ago.
-I use this code, and turn it to command line.
-
 ## feature
 
--   TODO: integrate with [exiahuang/xysfdx](https://github.com/exiahuang/xysfdx), and run in vscode.
+-   This is the command line app of [exiahuang/SalesforceXyTools](https://github.com/exiahuang/SalesforceXyTools).
+-   Integrate with [exiahuang/xysfdx](https://github.com/exiahuang/xysfdx), and run in vscode.
 -   use python3
 
 # install
@@ -30,6 +26,50 @@ git clone https://github.com/exiahuang/sfdc-cli
 python3 setup.py install
 ```
 
+# Summary
+
+| command | description | 
+| ---- | ---- | 
+| sfdc project:init | init sfdc project | 
+| sfdc meta:retrieve | retrieve metadata | 
+| sfdc meta:template:apex:create | init apex from tempalte | 
+| sfdc meta:template:trigger:create | init trigger from tempalte | 
+| sfdc meta:template:page:create | init page(visualforce) from tempalte | 
+| sfdc meta:template:component:create | init component(visualforce) from tempalte | 
+| sfdc meta:new | create metadata in sfdc server | 
+| sfdc meta:update | update metadata in sfdc server | 
+| sfdc meta:update:force | force update metadata in sfdc server | 
+| sfdc meta:delete | delete metadata in sfdc server | 
+| sfdc meta:refresh | refresh metadata in sfdc server | 
+| sfdc meta:attr | print metadata attribute | 
+| sfdc meta:refresh:dir | refresh metadata dir from sfdc server | 
+| sfdc packagexml:server | build all packagexml from server | 
+| sfdc packagexml:local | scan local directory to build package.xml | 
+| sfdc apex:execute | Executes anonymous Apex code | 
+| sfdc apex:test:run | run apex testclass | 
+| sfdc apex:test:coverage | get apex coverage | 
+| sfdc sobject:list | list sobject | 
+| sfdc sobject:fields:desc | describe sobject fields | 
+| sfdc sobject:export:xlsx | export sfdc sobject as excel file | 
+| sfdc sobject:data:create | insert sobject data from json data | 
+| sfdc sobject:data:update | update sobject data from json data | 
+| sfdc sobject:data:get | get sobject data from sfdc server | 
+| sfdc sobject:data:delete | delete sobject data from sfdc server | 
+| sfdc data:soql:query | soql query | 
+| sfdc data:tooling:query | tooling query | 
+| sfdc call:rest:api | call salesforce rest api | 
+| sfdc coder:snippet:soql | soql snippet creator  | 
+| sfdc coder:apex:snippet:insert:data:from:soql | create apex code from soql query  | 
+| sfdc coder:apex:snippet:insert:ramdam:data | create insert sobject code, ramdam data | 
+| sfdc coder:apex:testclass:generator | generator testclass from apex code | 
+| sfdc coder:apex:page:generator | generator VisualForce/Controller/DTO/DAO Code from sobject | 
+| sfdc coder:copy:aura | copy lightning | 
+| sfdc coder:permission:build | create permission metadata | 
+| sfdc folder:list | list folder | 
+| sfdc download:attachment | download salesforce attachment | 
+| sfdc ant:migration:tool | init Ant Migration Tool | 
+
+
 # Usage
 
 ## print help
@@ -45,61 +85,61 @@ sfdc development kit v0.1.0
 
 positional arguments:
 
-    apex:test:coverage  see `apex:test:coverage -h`
-    data:soql:query     see `data:soql:query -h`
-    meta:new            see `meta:new -h`
-    folder:list         see `folder:list -h`
     ant:migration:tool  see `ant:migration:tool -h`
-    meta:update         see `meta:update -h`
-    meta:template:component
-                        see `meta:template:component -h`
-    sobject:data:delete
-                        see `sobject:data:delete -h`
-    meta:template:apex  see `meta:template:apex -h`
-    coder:apex:testclass:generator
-                        see `coder:apex:testclass:generator -h`
-    packagexml:local    see `packagexml:local -h`
     apex:execute        see `apex:execute -h`
-    coder:apex:snippet:insert:ramdam:data
-                        see `coder:apex:snippet:insert:ramdam:data -h`
-    sobject:export:xlsx
-                        see `sobject:export:xlsx -h`
-    meta:attr           see `meta:attr -h`
-    sobject:data:create
-                        see `sobject:data:create -h`
-    download:attachment
-                        see `download:attachment -h`
+    apex:test:coverage  see `apex:test:coverage -h`
+    apex:test:run       see `apex:test:run -h`
+    call:rest:api       see `call:rest:api -h`
     coder:apex:page:generator
                         see `coder:apex:page:generator -h`
-    meta:refresh:dir    see `meta:refresh:dir -h`
-    sobject:fields:desc
-                        see `sobject:fields:desc -h`
-    tools:json:format   json format
-    meta:retrieve       see `meta:retrieve -h`
-    coder:permission:build
-                        see `coder:permission:build -h`
-    sobject:data:get    see `sobject:data:get -h`
-    data:tooling:query  see `data:tooling:query -h`
-    meta:cache          see `meta:cache -h`
     coder:apex:snippet:insert:data:from:soql
                         see `coder:apex:snippet:insert:data:from:soql -h`
+    coder:apex:snippet:insert:ramdam:data
+                        see `coder:apex:snippet:insert:ramdam:data -h`
+    coder:apex:testclass:generator
+                        see `coder:apex:testclass:generator -h`
     coder:copy:aura     see `coder:copy:aura -h`
-    apex:test:run       see `apex:test:run -h`
+    coder:permission:build
+                        see `coder:permission:build -h`
     coder:permission:list
                         see `coder:permission:list -h`
-    meta:refresh        see `meta:refresh -h`
-    project:init        see `project:init -h`
-    meta:refresh:aura   see `meta:refresh:aura -h`
-    call:rest:api       see `call:rest:api -h`
-    meta:template:page  see `meta:template:page -h`
+    coder:snippet:soql  see `coder:snippet:soql -h`
+    data:soql:query     see `data:soql:query -h`
+    data:tooling:query  see `data:tooling:query -h`
+    download:attachment
+                        see `download:attachment -h`
+    folder:list         see `folder:list -h`
+    meta:attr           see `meta:attr -h`
+    meta:cache          see `meta:cache -h`
     meta:delete         see `meta:delete -h`
-    sobject:data:update
-                        see `sobject:data:update -h`
-    packagexml:server   see `packagexml:server -h`
-    sobject:list        see `sobject:list -h`
+    meta:new            see `meta:new -h`
+    meta:refresh        see `meta:refresh -h`
+    meta:refresh:aura   see `meta:refresh:aura -h`
+    meta:refresh:dir    see `meta:refresh:dir -h`
+    meta:retrieve       see `meta:retrieve -h`
+    meta:template:apex  see `meta:template:apex -h`
+    meta:template:component
+                        see `meta:template:component -h`
+    meta:template:page  see `meta:template:page -h`
     meta:template:trigger
                         see `meta:template:trigger -h`
-    coder:snippet:soql  see `coder:snippet:soql -h`
+    meta:update         see `meta:update -h`
+    packagexml:local    see `packagexml:local -h`
+    packagexml:server   see `packagexml:server -h`
+    project:init        see `project:init -h`
+    sobject:data:create
+                        see `sobject:data:create -h`
+    sobject:data:delete
+                        see `sobject:data:delete -h`
+    sobject:data:get    see `sobject:data:get -h`
+    sobject:data:update
+                        see `sobject:data:update -h`
+    sobject:export:xlsx
+                        see `sobject:export:xlsx -h`
+    sobject:fields:desc
+                        see `sobject:fields:desc -h`
+    sobject:list        see `sobject:list -h`
+    tools:json:format   json format
     help                see `help -h`
 
 optional arguments:
