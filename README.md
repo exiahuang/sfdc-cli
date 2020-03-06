@@ -13,8 +13,6 @@ It is licensed under the `Apache License 2.0`
 
 ## install from pip
 
-TODO: not work now.
-
 ```sh
 pip3 install sfdc-cli
 ```

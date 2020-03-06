@@ -10,9 +10,9 @@
 
 from sfdc_cli.version import __version__  # NOQA
 
-import os, sys
-# "[ %(filename)s :%(lineno)s - %(funcName)20s() %(levelname)s ] %(message)s"
+import io, os, sys
 
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 if os.path.exists(".xyconfig/logging.conf"):
     import logging.config
     logging.config.fileConfig(".xyconfig/logging.conf")
