@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import os
 from sfdc_cli.project import Project
+import getpass
+
 command_name = os.path.basename(__file__).split('.', 1)[0].replace("_", ":")
 
 
@@ -9,6 +11,10 @@ def register(parser, subparsers, **kwargs):
 
     def new_project(args):
         if args.projectdir:
+            if not args.username:
+                args.username = input("Sfdc Username: ")
+            if not args.password:
+                args.password = getpass.getpass('Sfdc Password: ')
             Project().init(project_dir=args.projectdir,
                            username=args.username,
                            password=args.password,
@@ -24,12 +30,14 @@ def register(parser, subparsers, **kwargs):
     parser_project.add_argument('-d',
                                 '--projectdir',
                                 type=str,
-                                help='project dir')
+                                help='project dir',
+                                required=False,
+                                default=".")
     parser_project.add_argument('-u',
                                 '--username',
                                 type=str,
                                 help='username',
-                                default="none")
+                                default=None)
     parser_project.add_argument('-t',
                                 '--security_token',
                                 type=str,
@@ -39,7 +47,7 @@ def register(parser, subparsers, **kwargs):
                                 '--password',
                                 type=str,
                                 help='password',
-                                default="none")
+                                default=None)
     parser_project.add_argument('-s',
                                 '--sourcedir',
                                 type=str,
