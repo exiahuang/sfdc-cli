@@ -14,12 +14,14 @@ from . import util
 from . import soap_envelopes
 from . import xmltodict
 import xml.dom.minidom
-from .myconsole import MyConsole
 import time
-import os
+import io, os, sys
 import base64
 import json
 from datetime import datetime
+
+import logging
+logger = logging.getLogger(__name__)
 
 DEFAULT_API_VERSION = '37.0'
 '''
@@ -51,8 +53,7 @@ class Soap(Salesforce):
                  version=DEFAULT_API_VERSION,
                  proxies=None,
                  session=None,
-                 client_id=None,
-                 myconsole=None):
+                 client_id=None):
         super(Soap,
               self).__init__(username, password, security_token, session_id,
                              instance, instance_url, organizationId, sandbox,
@@ -92,16 +93,11 @@ class Soap(Salesforce):
             'https://{instance}/services/Soap/s/{version}/'.format(
                 instance=self.sf_instance, version=self.sf_version))
 
-        if myconsole:
-            self.myconsole = myconsole
-        else:
-            self.myconsole = MyConsole()
-
-        self.myconsole.debug('>>>init Soap api')
-        self.myconsole.debug(self.base_url)
-        self.myconsole.debug(self.apex_url)
-        self.myconsole.debug(self.apex_api_url)
-        self.myconsole.debug('>>>init end')
+        logger.debug('>>>init Soap api')
+        logger.debug(self.base_url)
+        logger.debug(self.apex_url)
+        logger.debug(self.apex_api_url)
+        logger.debug('>>>init end')
 
     # get SObject by name
     def get_sobject(self, name):
@@ -126,9 +122,9 @@ class Soap(Salesforce):
             response = self._soap_post(self.apex_api_url, request_body,
                                        self.soap_headers)
             # result = requests.post(url, request_body, headers=headers, proxies=self.proxies, verify=False)
-            # self.myconsole.debug('>'*80)
-            # self.myconsole.debug(response.status_code)
-            # self.myconsole.debug(response.text)
+            # logger.debug('>'*80)
+            # logger.debug(response.status_code)
+            # logger.debug(response.text)
         except requests.exceptions.RequestException as e:
             self.result = {
                 "Error Message":
@@ -166,7 +162,7 @@ class Soap(Salesforce):
             result["debugLog"] = self._get_xml_content(response.text,
                                                        "faultstring")
 
-        # self.myconsole.debug(result["debugLog"])
+        # logger.debug(result["debugLog"])
         return result
 
     def _get_xml_content(self, xml, tag):
@@ -177,20 +173,20 @@ class Soap(Salesforce):
             pass
 
     def _soap_post(self, url, request_body, headers, **kwargs):
-        self.myconsole.debug('>>>start soap post : ' + url)
+        logger.debug('>>>start soap post : ' + url)
         result = requests.post(url,
                                request_body,
                                headers=headers,
                                proxies=self.proxies,
                                verify=False)
-        self.myconsole.debug("request headers:\n%s" % headers)
-        self.myconsole.debug("request body:\n%s" % request_body)
-        self.myconsole.debug('response result:\n%s' % result)
-        self.myconsole.debug('response status_code: %s' % result.status_code)
+        logger.debug("request headers:\n%s" % headers)
+        logger.debug("request body:\n%s" % request_body)
+        logger.debug('response result:\n%s' % result)
+        logger.debug('response status_code: %s' % result.status_code)
 
         if result.status_code >= 300:
-            self.myconsole.debug(result.status_code)
-            self.myconsole.debug(result.text)
+            logger.debug(result.status_code)
+            logger.debug(result.text)
             raise SoapException(result, result.status_code)
         return result
 
@@ -236,16 +232,15 @@ class MetadataApi(Soap):
                  version=DEFAULT_API_VERSION,
                  proxies=None,
                  session=None,
-                 client_id=None,
-                 myconsole=None):
+                 client_id=None):
         super(MetadataApi,
               self).__init__(username, password, security_token, session_id,
                              instance, instance_url, organizationId, sandbox,
-                             version, proxies, session, client_id, myconsole)
+                             version, proxies, session, client_id)
         self.describe_metadata_response = None
 
     def _doSoapQuery(self, name, request_body):
-        self.myconsole.debug('>>>retrieve')
+        logger.debug('>>>retrieve')
         try:
             response = self._soap_post(self.meta_api_url, request_body,
                                        self.soap_headers)
@@ -267,7 +262,7 @@ class MetadataApi(Soap):
             return self.result
 
     def _doSoapQueryList(self, name, request_body):
-        self.myconsole.debug('>>>doSoapQueryList')
+        logger.debug('>>>doSoapQueryList')
         try:
             response = self._soap_post(self.meta_api_url, request_body,
                                        self.soap_headers)
@@ -322,7 +317,7 @@ class MetadataApi(Soap):
                         "metadata_type": metaObj["xmlName"],
                         "folder": folder['fullName']
                     })
-                self.myconsole.debug('>>>list infolder : ' + metaObj["xmlName"])
+                logger.debug('>>>list infolder : ' + metaObj["xmlName"])
                 if query_option_list is not None and len(query_option_list) > 0:
                     members.extend([
                         meta["fullName"]
@@ -388,20 +383,20 @@ class MetadataApi(Soap):
 
     # https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_folder.htm
     def listFolder(self, type_name):
-        self.myconsole.debug('>>>listFolder')
+        logger.debug('>>>listFolder')
         if type_name == "EmailTemplate":
             metadata_type = "EmailFolder"
         elif "Folder" in type_name:
             metadata_type = type_name
         else:
             metadata_type = type_name + "Folder"
-        self.myconsole.debug(metadata_type)
+        logger.debug(metadata_type)
         folders = self.listMetadata([{
             "metadata_type": metadata_type,
             "folder": ""
         }])
-        self.myconsole.debug('>>>listFolderResult:')
-        self.myconsole.debug(folders)
+        logger.debug('>>>listFolderResult:')
+        logger.debug(folders)
         return folders
 
     def listMetadata(self, query_option_list):
@@ -426,12 +421,12 @@ class MetadataApi(Soap):
                 query_option_list=query_option_list,
                 api_version=self.sf_version)
             result = self._doSoapQueryList("listMetadataResponse", request_body)
-            self.myconsole.debug(result)
+            logger.debug(result)
             if not isinstance(result, list):
                 result = []
             return result
         except Exception as e:
-            self.myconsole.error(e)
+            logger.error(e)
             return []
 
     def describeMetadata(self):
@@ -460,8 +455,8 @@ class MetadataApi(Soap):
             result = self.checkRetrieveStatus(process_id)
             if is_done == 'false':
                 if result["status"] != "Succeeded":
-                    self.myconsole.debug(result)
-                self.myconsole.log("retrieve status=%s, id=%s, please wait. " %
+                    logger.debug(result)
+                logger.info("retrieve status=%s, id=%s, please wait. " %
                                    (result["status"], result["id"]))
             if not result or not result["success"]:
                 self.result = result
@@ -540,8 +535,7 @@ class ToolingApi(Salesforce):
                  version=DEFAULT_API_VERSION,
                  proxies=None,
                  session=None,
-                 client_id=None,
-                 myconsole=None):
+                 client_id=None):
         super(ToolingApi,
               self).__init__(username, password, security_token, session_id,
                              instance, instance_url, organizationId, sandbox,
@@ -550,10 +544,6 @@ class ToolingApi(Salesforce):
         self.tooling_api_url = (
             'https://{instance}/services/Soap/T/{version}/'.format(
                 instance=self.sf_instance, version=self.sf_version))
-        if myconsole:
-            self.myconsole = myconsole
-        else:
-            self.myconsole = MyConsole()
 
     def getMetadata(self, metadata_type, id):
         url = self.base_url + 'sobjects/' + metadata_type + '/' + id
@@ -565,7 +555,7 @@ class ToolingApi(Salesforce):
         status_code, result = self._call_api(method="POST",
                                              url=url,
                                              data=post_body)
-        self.myconsole.debug(result)
+        logger.debug(result)
         return status_code, result
 
     def deleteMetadata(self, metadata_type, id):
@@ -574,19 +564,19 @@ class ToolingApi(Salesforce):
                                              url=url,
                                              data=None,
                                              return_type='text')
-        self.myconsole.debug(result)
+        logger.debug(result)
         if status_code >= 300:
-            self.myconsole.debug(result)
+            logger.debug(result)
         else:
-            self.myconsole.debug('>>>delete OK')
-            self.myconsole.debug(result)
+            logger.debug('>>>delete OK')
+            logger.debug(result)
         return status_code, result
 
     def updateMetadata(self, metadata_type, id, body):
         # create MetadataContainer
         MetadataContainerId = self._createMetadataContainer(id)
         if not MetadataContainerId:
-            self.myconsole.debug("create MetadataContainer error!")
+            logger.debug("create MetadataContainer error!")
             return
 
         # create ApexClassMember
@@ -594,31 +584,31 @@ class ToolingApi(Salesforce):
                                                        MetadataContainerId, id,
                                                        body)
         if not ApexClassMemberId:
-            self.myconsole.debug("create ApexClassMember error!")
+            logger.debug("create ApexClassMember error!")
             return
 
         # create ContainerAsyncRequest
         containerAsyncRequestId = self._createContainerAsyncRequest(
             MetadataContainerId, "false")
         if not containerAsyncRequestId:
-            self.myconsole.debug("create ContainerAsyncRequest error!")
+            logger.debug("create ContainerAsyncRequest error!")
             return
 
         # check ContainerAsyncRequest Status
         ContainerAsyncRequest_status_code, ContainerAsyncRequest_status = self._checkContainerAsyncRequestStatue(
             containerAsyncRequestId)
-        self.myconsole.debug(">>>check ContainerAsyncRequest Status")
-        self.myconsole.debug(ContainerAsyncRequest_status)
+        logger.debug(">>>check ContainerAsyncRequest Status")
+        logger.debug(ContainerAsyncRequest_status)
 
         # delete MetadataContainer
-        self.myconsole.debug('>>>delete MetadataContainer')
+        logger.debug('>>>delete MetadataContainer')
         url = self.base_url + 'tooling/sobjects/MetadataContainer/' + MetadataContainerId
         status_code, result = self._call_api(method="DELETE",
                                              url=url,
                                              data=None,
                                              return_type='text')
-        self.myconsole.debug(status_code)
-        self.myconsole.debug(result)
+        logger.debug(status_code)
+        logger.debug(result)
 
         result = {
             "status_code":
@@ -713,7 +703,7 @@ class ToolingApi(Salesforce):
                     "problem": msg["problem"]
                 }
         except Exception as ex:
-            self.myconsole.debug(ex)
+            logger.debug(ex)
             pass
         return {
             "lineNumber": "",
@@ -728,8 +718,8 @@ class ToolingApi(Salesforce):
         status_code, result = self._call_api(method="POST",
                                              url=url,
                                              data=params)
-        self.myconsole.debug(">>>create MetadataContainer object")
-        self.myconsole.debug(result)
+        logger.debug(">>>create MetadataContainer object")
+        logger.debug(result)
         MetadataContainerId = ""
         if "success" in result and result["success"]:
             MetadataContainerId = result["id"]
@@ -746,8 +736,8 @@ class ToolingApi(Salesforce):
         status_code, result = self._call_api(method="POST",
                                              url=url,
                                              data=params)
-        self.myconsole.debug('>>>create %sMember' % MetadataType)
-        self.myconsole.debug(result)
+        logger.debug('>>>create %sMember' % MetadataType)
+        logger.debug(result)
         memberId = ""
         if "success" in result and result["success"]:
             memberId = result["id"]
@@ -767,27 +757,30 @@ class ToolingApi(Salesforce):
         status_code, result = self._call_api(method="POST",
                                              url=containerAsyncRequest_url,
                                              data=params)
-        self.myconsole.debug('>>>create containerAsyncRequest')
-        self.myconsole.debug(result)
+        logger.debug('>>>create containerAsyncRequest')
+        logger.debug(result)
         containerAsyncRequestId = ""
         if "success" in result and result["success"]:
             containerAsyncRequestId = result["id"]
         return containerAsyncRequestId
 
     def _checkContainerAsyncRequestStatue(self, containerAsyncRequestId):
-        check_status_url = self.base_url + 'tooling/sobjects/containerAsyncRequest/' + containerAsyncRequestId
-        status_code, result = self._call_api(method="GET",
-                                             url=check_status_url,
-                                             data=None)
-        while result["State"] == "Queued":
-            time.sleep(2)
-            self.myconsole.info(
-                "check ContainerAsyncRequest Status : please wait...")
+        try:
+            check_status_url = self.base_url + 'tooling/sobjects/containerAsyncRequest/' + containerAsyncRequestId
             status_code, result = self._call_api(method="GET",
-                                                 url=check_status_url,
-                                                 data=None)
-            self.myconsole.debug(result['State'])
-        return status_code, result
+                                                url=check_status_url,
+                                                data=None)
+            while result["State"] == "Queued":
+                time.sleep(2)
+                logger.info(
+                    "check ContainerAsyncRequest Status : please wait...")
+                status_code, result = self._call_api(method="GET",
+                                                    url=check_status_url,
+                                                    data=None)
+                logger.debug(result['State'])
+            return status_code, result
+        except Exception as ex:
+            logger.error(ex)
 
 
 class SoapException(Exception):

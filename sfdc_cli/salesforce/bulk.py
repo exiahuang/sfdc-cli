@@ -80,7 +80,7 @@ class Bulk(Soap):
             self, username=None, password=None, security_token=None,
             session_id=None, instance=None, instance_url=None,
             organizationId=None, sandbox=False, version=DEFAULT_API_VERSION,
-            proxies=None, session=None, client_id=None, settings=None, myconsole=None):
+            proxies=None, session=None, client_id=None, settings=None):
         super(Bulk, self).__init__(username, password, security_token,
             session_id, instance, instance_url,
             organizationId, sandbox, version,

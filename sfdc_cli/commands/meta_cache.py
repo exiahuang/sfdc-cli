@@ -9,7 +9,7 @@ command_name = os.path.basename(__file__).split('.', 1)[0].replace("_", ":")
 def register(parser, subparsers, **kwargs):
 
     def handler(args):
-        if args.project and args.sourcepath:
+        if args.project:
             meta_api = MetadataApi(project_dir=args.project)
             meta_api.reload_cache()
         else:

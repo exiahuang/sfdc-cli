@@ -22,14 +22,6 @@ except ImportError:
         print('Cannot import py2exe', file=sys.stderr)
         exit(1)
 
-py2exe_options = {
-    'bundle_files': 1,
-    'compressed': 1,
-    'optimize': 2,
-    'dist_dir': '.',
-    # 'dll_excludes': [],
-}
-
 DESCRIPTION = 'sfdc development kit'
 LONG_DESCRIPTION = '''
 sfdc development kit
@@ -39,23 +31,6 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
-py2exe_console = [{
-    'script': './sfdc_cli/cli.py',
-    'dest_base': 'sfdc-cli',
-    'version': __version__,
-    'description': DESCRIPTION,
-    'comments': LONG_DESCRIPTION,
-    'product_name': 'sfdc-cli',
-    'product_version': __version__,
-}]
-
-py2exe_params = {
-    'console': py2exe_console,
-    'options': {
-        'py2exe': py2exe_options
-    },
-    'zipfile': None
-}
 
 tests_require = [
     'mock',
@@ -70,9 +45,37 @@ tests_require = [
 ]
 
 if len(sys.argv) >= 2 and sys.argv[1] == 'py2exe':
-    params = py2exe_params
+    py2exe_console = [{
+        'script': './sfdc_cli/__main__.py',
+        'dest_base': 'sfdc',
+        'version': __version__,
+        'description': DESCRIPTION,
+        'comments': DESCRIPTION,
+        'product_name': 'sfdc-cli',
+        'product_version': __version__,
+    }]
+    py2exe_options = {
+        'bundle_files': 1,
+        'compressed': 1,
+        'optimize': 2,
+        'dist_dir': '.\\dist\\win',
+        'includes': [
+            "sfdc_cli",
+            "sfdc_cli.commands",
+            "requests",
+            "xlsxwriter"
+        ]
+    }
+    params = {
+        'console': py2exe_console,
+        'options': {
+            'py2exe': py2exe_options
+        },
+        'zipfile': None
+    }
 else:
     params = {
+        'long_description_content_type': 'text/markdown',
         'packages': find_packages(),
         'include_package_data': True,
         'entry_points': {
@@ -88,7 +91,6 @@ setup(
     version=__version__,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
-    long_description_content_type='text/markdown',
     keywords='sfdc-cli sdk tools xytools-cli salesforce',
     author='exiahuang',
     author_email='exia.huang@outlook.com',

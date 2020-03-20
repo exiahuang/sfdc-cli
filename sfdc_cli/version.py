@@ -8,4 +8,5 @@
 # http://www.opensource.org/licenses/Apache-2.0
 # Copyright (c) 2020, exiahuang <exia.huang@outlook.com>
 
-__version__ = '0.2'  # NOQA
+__version__ = '0.4'  # NOQA
+__desc__ = 'sfdc development kit'

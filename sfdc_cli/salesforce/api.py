@@ -10,6 +10,7 @@ DEFAULT_API_VERSION = '29.0'
 
 
 import logging
+import traceback
 import warnings
 import json
 try:
@@ -450,7 +451,15 @@ class Salesforce(object):
         elif return_type == "content":
             return result.status_code, result.content
         else:
-            return result.status_code, result.json()
+            try:
+                return result.status_code, result.json()
+            except Exception as ex:
+                logger.error('json parse error')
+                logger.error(ex)
+                logger.error("code: %s" % result.status_code)
+                logger.error("content: %s" % result.text)
+                logger.debug(traceback.format_exc())
+                raise ex
 
     @property
     def request(self):

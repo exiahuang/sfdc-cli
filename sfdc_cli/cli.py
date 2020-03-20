@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-from sfdc_cli.version import __version__
-from .commands import register
+from sfdc_cli.version import __version__, __desc__
+from sfdc_cli.commands import register
 
 
 def main():
-    parser = argparse.ArgumentParser(description='sfdc development kit v%s' %
-                                     __version__)
+    parser = argparse.ArgumentParser(description='%s v%s' %
+                                     (__desc__, __version__))
     subparsers = parser.add_subparsers()
     register(parser, subparsers)
 

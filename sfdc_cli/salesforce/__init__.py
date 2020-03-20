@@ -31,7 +31,5 @@ from .core import (
     SoapException
 )
 
-
-
-
 from .bulk import Bulk
+

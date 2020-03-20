@@ -738,6 +738,18 @@ python3 setup.py sdist
 python3 setup.py bdist_wininst
 ```
 
+## py2exe build windows exe
+
+```sh
+py -3.4 -m venv .py34
+.py34\Scripts\activate.bat
+# python -m pip install --upgrade pip
+pip install py2exe setuptools
+pip install requests XlsxWriter
+python -V
+python setup.py py2exe
+```
+
 # Acknowledgement
 
 ## Basic on OpenSource

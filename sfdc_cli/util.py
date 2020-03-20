@@ -11,7 +11,6 @@ from time import sleep
 from .salesforce import *
 from . import baseutil, logging
 from .baseutil import SysIo
-from .subconsole import SublConsole
 from .setting import SfBasicConfig, OAUTH2_SETTING
 from .const import AURA_DEFTYPE_EXT
 
@@ -21,8 +20,6 @@ from .const import AURA_DEFTYPE_EXT
 ##########################################################################################
 def sf_login(sf_basic_config, project_name='', Soap_Type=Soap):
     project = settings = sf_basic_config.get_setting()
-    sublconsole = SublConsole()
-
     try:
         if project_name:
             logging.debug('sf_login [project_name]: ' + project_name)
@@ -30,16 +27,14 @@ def sf_login(sf_basic_config, project_name='', Soap_Type=Soap):
                            password=project["password"],
                            security_token=project["security_token"],
                            sandbox=project["is_sandbox"],
-                           version=project["api_version"],
-                           myconsole=sublconsole)
+                           version=project["api_version"])
 
         elif settings["use_oauth2"]:
             logging.debug('Authentication type : use oauth2')
             sf = Soap_Type(session_id=project["access_token"],
                            instance_url=project["instance_url"],
                            sandbox=project["is_sandbox"],
-                           version=project["api_version"],
-                           myconsole=sublconsole)
+                           version=project["api_version"])
 
         elif settings["use_password"]:
             logging.debug('Authentication type : use password')
@@ -47,15 +42,14 @@ def sf_login(sf_basic_config, project_name='', Soap_Type=Soap):
                            password=project["password"],
                            security_token=project["security_token"],
                            sandbox=project["is_sandbox"],
-                           version=project["api_version"],
-                           myconsole=sublconsole)
+                           version=project["api_version"])
 
         sf.settings = settings
         logging.debug("login success! %s " % sf.session_id)
         return sf
     except Exception as e:
         if settings["use_oauth2"]:
-            sublconsole.showlog('please login salesforce on your browser!')
+            logging.info('please login salesforce on your browser!')
             sf_oauth2(sf_basic_config)
         else:
             logging.error('Login Error! ' + baseutil.xstr(e))
@@ -76,7 +70,6 @@ def re_auth(sf_basic_config):
 
 
 def sf_oauth2(sf_basic_config):
-    sublconsole = SublConsole()
     settings = sf_basic_config.get_setting()
     from .libs import auth
     project_setting = settings
@@ -171,7 +164,6 @@ class CacheLoader(object):
         else:
             self.sf_basic_config = SfBasicConfig()
 
-        self.sublconsole = SublConsole()
         self.settings = self.sf_basic_config.get_setting()
         self.MAX_DEEP = 2
         self.file_name = file_name
@@ -214,14 +206,14 @@ class CacheLoader(object):
     def save(self, json_str, encoding='utf-8'):
         full_path = self.full_path
         if not os.path.exists(os.path.dirname(full_path)):
-            self.sublconsole.debug("mkdir: " + os.path.dirname(full_path))
+            logging.debug("mkdir: " + os.path.dirname(full_path))
             os.makedirs(os.path.dirname(full_path))
         try:
             fp = open(full_path, "w", encoding=encoding)
             fp.write(json_str)
         except Exception as e:
-            self.sublconsole.error('save file error! ' + full_path)
-            self.sublconsole.error(e)
+            logging.error('save file error! ' + full_path)
+            logging.error(e)
         finally:
             fp.close()
 
@@ -249,7 +241,7 @@ class SobjectUtil(CacheLoader):
         self.meta_api = sf_login(self.sf_basic_config, Soap_Type=MetadataApi)
 
     def reload(self):
-        self.sublconsole.showlog(
+        logging.info(
             "start to reload metadata cache, please wait...")
         self.clean()
         allMetadataResult = self.meta_api.describe()
@@ -261,8 +253,7 @@ class SobjectUtil(CacheLoader):
             allMetadataMap["sobjects"][name] = meta
         allMetadataMap["lastUpdated"] = str(datetime.now())
         self.save_dict(allMetadataMap)
-        self.sublconsole.showlog("load metadata cache done.")
-        # self.sublconsole.save_and_open_in_panel(json.dumps(allMetadataMap, ensure_ascii=False, indent=4), self.save_dir, self.file_name , is_open=False)
+        logging.info("load metadata cache done.")
 
     # get all fields from sobject
     def get_sobject_fields(self, sobject_name):
@@ -334,10 +325,10 @@ class SobjectUtil(CacheLoader):
                 .format(instance=sf.sf_instance,
                         sid=sf.session_id,
                         returl=returl))
-            self.sublconsole.debug(login_url)
+            logging.debug(login_url)
             open_in_default_browser(self.sf_basic_config, login_url)
         else:
-            self.sublconsole.showlog("metadata is null!")
+            logging.info("metadata is null!")
 
 
 class MetadataUtil(CacheLoader):
@@ -351,7 +342,7 @@ class MetadataUtil(CacheLoader):
         self.all_cache = None
 
     def reload(self):
-        self.sublconsole.showlog(
+        logging.info(
             "start to reload metadata cache, please wait...")
         self.clean()
         meta_api = sf_login(self.sf_basic_config, Soap_Type=MetadataApi)
@@ -359,7 +350,7 @@ class MetadataUtil(CacheLoader):
         allMetadataResult = meta_api.getAllMetadataMap()
         allMetadataResult["AuraDefinition"] = self._load_lux_cache()
         self.save_dict(allMetadataResult)
-        self.sublconsole.showlog("load metadata cache done.")
+        logging.info("load metadata cache done.")
 
     def _covert_AuraDefinition_to_cache_dict(self, AuraDefinition_records):
         AuraDefinition_MetadataMap = {}
@@ -411,7 +402,7 @@ class MetadataUtil(CacheLoader):
                     }
             return AuraDefinition_MetadataMap
         except Exception as ex:
-            self.sublconsole.showlog(ex, 'error')
+            logging.error(ex)
             return AuraDefinition_MetadataMap
 
     def _load_lux_cache(self, attr=None):
@@ -434,7 +425,7 @@ class MetadataUtil(CacheLoader):
                     return {}
             return AuraDefinition_MetadataMap
         except Exception as ex:
-            self.sublconsole.showlog(ex, 'error')
+            logging.error(ex)
             return {}
 
     def get_meta_attr(self, full_path):
@@ -451,7 +442,7 @@ class MetadataUtil(CacheLoader):
         return attr
 
     def get_describe_metadata_cache(self, deep=1):
-        self.sublconsole.debug("build describeMetadata Cache")
+        logging.debug("build describeMetadata Cache")
         desc_meta_path = os.path.join(self.sf_basic_config.get_config_dir(),
                                       self.desc_meta_file)
         if os.path.exists(desc_meta_path):
@@ -462,11 +453,8 @@ class MetadataUtil(CacheLoader):
         elif deep <= self.MAX_DEEP:
             meta_api = sf_login(self.sf_basic_config, Soap_Type=MetadataApi)
             describeMetadataResult = meta_api.describeMetadata()
-            self.sublconsole.save_and_open_in_panel(json.dumps(
-                describeMetadataResult, ensure_ascii=False, indent=4),
-                                                    self.save_dir,
-                                                    self.desc_meta_file,
-                                                    is_open=False)
+            baseutil.save_file(os.path.join(self.save_dir, self.desc_meta_file), content=json.dumps(
+                describeMetadataResult, ensure_ascii=False, indent=4))
             deep = deep + 1
             return self.get_describe_metadata_cache(deep)
         return
@@ -511,10 +499,10 @@ class MetadataUtil(CacheLoader):
         if not attr:
             self._save_meta(server_meta)
             return "Maybe the server metadata is lasted!"
-        self.sublconsole.debug('>>>check is modified')
-        self.sublconsole.debug(attr)
-        self.sublconsole.debug(server_meta)
-        self.sublconsole.debug(
+        logging.debug('>>>check is modified')
+        logging.debug(attr)
+        logging.debug(server_meta)
+        logging.debug(
             'File=%s, Id=%s, local : %s , server : %s' %
             (attr["file_key"], attr["id"], attr["lastModifiedDate"],
              server_meta["lastModifiedDate"]))
@@ -527,7 +515,7 @@ class MetadataUtil(CacheLoader):
         return ""
 
     def get_web_url(self, sel_meta):
-        self.sublconsole.debug(sel_meta)
+        logging.debug(sel_meta)
         returl = ""
         if "type" in sel_meta:
             sel_category = sel_meta["type"]
@@ -560,10 +548,10 @@ class MetadataUtil(CacheLoader):
                 .format(instance=sf.sf_instance,
                         sid=sf.session_id,
                         returl=urllib.parse.quote(returl)))
-            self.sublconsole.debug(login_url)
+            logging.debug(login_url)
             open_in_default_browser(self.sf_basic_config, login_url)
         else:
-            self.sublconsole.showlog("metadata is null!")
+            logging.info("metadata is null!")
 
     def run_test(self, id_list):
         tooling_api = sf_login(self.sf_basic_config, Soap_Type=ToolingApi)
@@ -584,11 +572,7 @@ class MetadataUtil(CacheLoader):
             json.dumps(result, ensure_ascii=False, indent=4), coverage_info,
             apex_log
         ])
-        self.sublconsole.save_and_open_in_panel(
-            test_result,
-            self.sf_basic_config.get_test_dir(),
-            file_name,
-            is_open=True)
+        baseutil.save_file(os.path.join(self.sf_basic_config.get_test_dir(), file_name), content=test_result)
         logging.info(
             os.path.join(self.sf_basic_config.get_test_dir(), file_name))
 
@@ -636,30 +620,25 @@ class MetadataUtil(CacheLoader):
     def _del_meta(self, meta):
         all_cache = self.get_cache()
         del all_cache[meta["type"]][meta["fileName"]]
-        self.sublconsole.debug("_del_meta")
-        self.sublconsole.debug(meta)
-        self.sublconsole.save_and_open_in_panel(json.dumps(all_cache,
+        logging.debug("_del_meta")
+        logging.debug(meta)
+        baseutil.save_file(os.path.join(self.save_dir, self.file_name), content=json.dumps(all_cache,
                                                            ensure_ascii=False,
-                                                           indent=4),
-                                                self.save_dir,
-                                                self.file_name,
-                                                is_open=False)
+                                                           indent=4))
 
     def _save_meta(self, server_meta):
-        self.sublconsole.debug("_save_meta")
+        logging.debug("_save_meta")
         all_cache = self.get_cache()
-        self.sublconsole.debug(server_meta)
+        logging.debug(server_meta)
         if server_meta and "type" in server_meta:
             if server_meta["type"] not in all_cache:
                 all_cache[server_meta["type"]] = {}
             all_cache[server_meta["type"]][
                 server_meta["fileName"]] = server_meta
-            self.sublconsole.debug(server_meta)
-            self.sublconsole.save_and_open_in_panel(json.dumps(
-                all_cache, ensure_ascii=False, indent=4),
-                                                    self.save_dir,
-                                                    self.file_name,
-                                                    is_open=False)
+            logging.debug(server_meta)
+            baseutil.save_file(os.path.join(self.save_dir,
+                                                    self.file_name), content=json.dumps(
+                    all_cache, ensure_ascii=False, indent=4))
 
     def _get_server_meta(self, full_path, id):
         attr = self.get_meta_attr(full_path)
@@ -756,12 +735,9 @@ class MetadataUtil(CacheLoader):
             all_cache["AuraDefinition"] = {}
         all_cache["AuraDefinition"].update(
             self._covert_AuraDefinition_to_cache_dict(AuraDefinition_records))
-        self.sublconsole.save_and_open_in_panel(json.dumps(all_cache,
+        baseutil.save_file(os.path.join(self.save_dir, self.file_name), content=json.dumps(all_cache,
                                                            ensure_ascii=False,
-                                                           indent=4),
-                                                self.save_dir,
-                                                self.file_name,
-                                                is_open=False)
+                                                           indent=4))
 
 
 class SfDataUtil():
@@ -789,7 +765,6 @@ class DownloadUtil(object):
         else:
             self.sf_basic_config = SfBasicConfig()
 
-        self.sublconsole = SublConsole()
         self.settings = self.sf_basic_config.get_setting()
         # v2.0.4 donot auto download
         if is_auto_download:
@@ -799,10 +774,10 @@ class DownloadUtil(object):
         jar_home = self.sf_basic_config.get_default_jar_home()
         jar_full_path = self.get_jar_path()
         if not os.path.exists(jar_home):
-            self.sublconsole.showlog("mkdir : " + jar_home)
+            logging.info("mkdir : " + jar_home)
             os.makedirs(jar_home)
         if not os.path.exists(jar_full_path):
-            self.sublconsole.showlog("download jar : " + jar_full_path)
+            logging.info("download jar : " + jar_full_path)
             self._start_to_download_jar()
 
     def _start_to_download_jar(self):
@@ -817,7 +792,7 @@ class DownloadUtil(object):
         except Exception as e:
             help_msg = "please copy %s to %s" % (
                 jar_name, self.sf_basic_config.get_default_jar_home())
-            self.sublconsole.showlog("download %s error, %s, \n%s" %
+            logging.error("download %s error, %s, \n%s" %
                                      (url, str(e), help_msg))
             pass
 
@@ -856,7 +831,7 @@ class DataloaderUtil(DownloadUtil):
                 self._get_split_code())[0].decode('utf-8')
             password = ret_data[-32:]
         except Exception as e:
-            self.sublconsole.showlog("getEncryptionPassword exception: " +
+            logging.error("getEncryptionPassword exception: " +
                                      str(e))
         return password
 
@@ -1064,21 +1039,21 @@ class OsUtil():
         else:
             self.sf_basic_config = SfBasicConfig()
 
-        self.sublconsole = SublConsole()
         self.settings = self.sf_basic_config.get_setting()
         self.sys_encoding = sys.getfilesystemencoding()
 
     def run_in_sublime_cmd(self, cmd_list, encoding=None):
         if not encoding:
             encoding = self.sys_encoding
-        self.sublconsole.thread_run(target=self._run_cmd,
+        from .subconsole import SublConsole
+        SublConsole().thread_run(target=self._run_cmd,
                                     args=(
                                         cmd_list,
                                         encoding,
                                     ))
 
     def _run_cmd(self, cmd_list, encoding):
-        self.sublconsole.showlog("*" * 80)
+        logging.info("*" * 80)
         cmd_str = self._get_cmd_str(cmd_list)
         process = subprocess.Popen(cmd_str,
                                    shell=True,
@@ -1095,10 +1070,10 @@ class OsUtil():
                     msg = line.rstrip().decode(self.sys_encoding)
                 except Exception as ex:
                     msg = line.rstrip()
-                self.sublconsole.showlog(msg, show_time=False)
+                logging.info(msg)
             else:
                 break
-        self.sublconsole.showlog("*" * 80)
+        logging.info("*" * 80)
 
     def os_run(self, cmd_list):
         if self.sf_basic_config.is_use_os_terminal():
@@ -1132,7 +1107,6 @@ class DiffUtil():
         else:
             self.sf_basic_config = SfBasicConfig()
 
-        self.sublconsole = SublConsole()
         self.settings = self.sf_basic_config.get_setting()
 
     def diff(self, local_file, server_file):
@@ -1160,9 +1134,10 @@ class DiffUtil():
                                     lineterm='')
         difftxt = u"\n".join(line for line in diff)
         if difftxt == "":
-            self.sublconsole.showlog("There is no difference !")
+            logging.info("There is no difference !")
         else:
-            self.sublconsole.show_in_new_tab(difftxt, "local <-> server")
+            logging.info("Has difference !")
+            # SublConsole().show_in_new_tab(difftxt, "local <-> server")
 
     def _read_file(self, file):
         f = open(file, "r", encoding='utf-8')
